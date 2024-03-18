@@ -11,7 +11,7 @@ import SwiftUI
 struct TinderDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
         }
     }
 }

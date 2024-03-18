@@ -9,6 +9,7 @@ import Foundation
 
 @Observable class CardViewModel {
   var cardModels = [CardModel]()
+  var buttonSwipeAction: SwipeAction?
   
   private let service: CardService
   
@@ -23,6 +24,12 @@ import Foundation
     } catch {
       print("DEBUG: Failed to fetch cards with error: \(error)")
     }
+  }
+  
+  func removeCard(_ card: CardModel) {
+    guard let index = cardModels.firstIndex(where: { $0.id == card.id }) else { return }
+    
+    cardModels.remove(at: index)
   }
 }
 
