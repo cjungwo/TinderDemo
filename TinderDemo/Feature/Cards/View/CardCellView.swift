@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct CardCellView: View {
+  @Environment(MatchManager.self) var matchManager
   @Environment(CardViewModel.self) var viewModel
   
   @State private var xOffset: CGFloat = 0
   @State private var degrees: Double = 0
   @State private var currentImageIndex = 0
+  @State private var showProfileModal = false
   
   let model: CardModel
   
@@ -38,7 +40,13 @@ struct CardCellView: View {
         SwipeActionIndicatorView(xOffset: $xOffset)
       }
       
-      UserInfoView(user: user)
+      UserInfoView(
+        showProfileModal: $showProfileModal,
+        user: user
+      )
+    }
+    .fullScreenCover(isPresented: $showProfileModal) {
+      UserProfileView(user: user)
     }
     .onReceive(viewModel.buttonSwipeAction.publisher, perform: { action in
       onReceiveSwipeAction(action)
@@ -78,6 +86,7 @@ private extension CardCellView {
       xOffset = 500
       degrees = 12
     } completion: {
+      matchManager.checkForMatch(withUser: user)
       viewModel.removeCard(model)
       viewModel.buttonSwipeAction = nil
     }
@@ -135,4 +144,5 @@ private extension CardCellView {
     model: CardModel(user: MockData.users[0])
   )
   .environment(CardViewModel(service: CardService()))
+  .environment(MatchManager())
 }

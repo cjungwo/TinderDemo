@@ -8,14 +8,49 @@
 import SwiftUI
 
 struct CardView: View {
+  @Environment(MatchManager.self) var matchManager
+  
   @State var viewModel = CardViewModel(service: CardService())
   
+  @State private var showMatchView = false
+  
   var body: some View {
-    if !viewModel.cardModels.isEmpty {
-      CardStackView()
-        .environment(viewModel)
-    } else {
-      AnnounceView(viewModel: viewModel)
+    NavigationStack {
+      ZStack {
+        VStack {
+          if !viewModel.cardModels.isEmpty {
+            CardStackView()
+              .environment(viewModel)
+              .environment(matchManager)
+          } else {
+            AnnounceView(viewModel: viewModel)
+          }
+        }
+        .blur(radius: showMatchView ? 20 : 0)
+        
+        if showMatchView {
+          UserMatchView(show: $showMatchView)
+        }
+      }
+      .onReceive(matchManager.matchedUser.publisher, perform: { user in
+        showMatchView = user != nil
+        print("DEBUG: CV \(showMatchView)")
+      })
+      .toolbar {
+        ToolbarItem(placement: .topBarLeading) {
+          HStack {
+            Image(systemName: "flame")
+              .resizable()
+              .frame(width: 20, height: 24)
+              .foregroundStyle(.red)
+            
+            Text("Tinder")
+              .font(.system(size: 28))
+              .foregroundStyle(.primary)
+              .fontWeight(.medium)
+          }
+        }
+      }
     }
   }
 }
@@ -68,4 +103,5 @@ private struct AnnounceView: View {
 
 #Preview {
   CardView()
+    .environment(MatchManager())
 }

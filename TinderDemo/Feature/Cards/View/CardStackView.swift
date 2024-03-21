@@ -28,4 +28,5 @@ struct CardStackView: View {
 #Preview {
     CardStackView()
     .environment(CardViewModel(service: CardService()))
+    .environment(MatchManager())
 }
